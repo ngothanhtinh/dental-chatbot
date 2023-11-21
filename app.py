@@ -72,7 +72,7 @@ API_O = st.secrets["OPENAI_API_KEY"]
 # Session state storage would be ideal
 if API_O:
     embeddings = OpenAIEmbeddings()
-    db = FAISS.load_local('/db', embeddings)
+    db = FAISS.load_local('db', embeddings)
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
     # Create an OpenAI instance
