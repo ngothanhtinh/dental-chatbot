@@ -6,6 +6,24 @@ from langchain.chains.conversation.prompt import ENTITY_MEMORY_CONVERSATION_TEMP
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 
+# Initialize session states
+if "generated" not in st.session_state:
+    st.session_state["generated"] = []
+if "past" not in st.session_state:
+    st.session_state["past"] = []
+if "input" not in st.session_state:
+    st.session_state["input"] = ""
+if "stored_session" not in st.session_state:
+    st.session_state["stored_session"] = []
+if "just_sent" not in st.session_state:
+    st.session_state["just_sent"] = False
+if "temp" not in st.session_state:
+    st.session_state["temp"] = ""
+if "balance" not in st.session_state:
+    st.session_state["balance"] = 0.0
+if "deposit" not in st.session_state:
+    st.session_state["deposit"] = 3.0
+
 
 def clear_text():
     st.session_state["temp"] = st.session_state["input"]
