@@ -1,0 +1,16 @@
+git init
+
+git add .
+
+git commit -m 'add file'
+
+git remote add origin https://github.com/ngothanhtinh/dental-chatbot.git
+
+ git push -u origin main
+
+
+--- 
+
+git status
+git branch -a
+git checkout -b main
