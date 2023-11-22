@@ -126,5 +126,5 @@ if st.session_state.stored_session:
     if st.sidebar.checkbox("Clear-all"):
         del st.session_state.stored_session
 
-# for i, chat in enumerate(st.session_state.history):
-#     st_message(**chat, key=str(i)) #unpacking
+for i, chat in enumerate(st.session_state.history):
+    st_message(**chat, key=str(i)) #unpacking
