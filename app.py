@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_chat import message as st_message
 from langchain import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
@@ -8,17 +9,27 @@ from langchain.vectorstores import FAISS
 # Initialize session states
 if "generated" not in st.session_state:
     st.session_state["generated"] = []
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
+if "past" not in st.session_state:
+    st.session_state["past"] = []
 if "input" not in st.session_state:
     st.session_state["input"] = ""
 if "stored_session" not in st.session_state:
     st.session_state["stored_session"] = []
-if "just_sent" not in st.session_state:
-    st.session_state["just_sent"] = False
 if "temp" not in st.session_state:
     st.session_state["temp"] = ""
+if "history" not in st.session_state:
+    st.session_state.history = []
 
+# Set up the Streamlit app layout
+st.title("Dental Care AI Chatbot")
+
+hide_default_format = """
+       <style>
+       #MainMenu {visibility: hidden; }
+       footer {visibility: hidden;}
+       </style>
+       """
+st.markdown(hide_default_format, unsafe_allow_html=True)
 
 
 def clear_text():
@@ -44,10 +55,8 @@ def new_chat():
         save.append("Bot:" + st.session_state["generated"][i])
     st.session_state["stored_session"].append(save)
     st.session_state["generated"] = []
-    st.session_state["chat_history"] = []
+    st.session_state["past"] = []
     st.session_state["input"] = ""
-    st.session_state.entity_memory.store = {}
-    st.session_state.entity_memory.buffer.clear()
 
 
 template = """Welcome to the virtual assistance of DR DEE Dental Clinic! As a dental assistant chatbot, your primary role is to provide customers with accurate information about dental care. Follow these guidelines to ensure effective and professional customer service:
@@ -66,7 +75,7 @@ template = """Welcome to the virtual assistance of DR DEE Dental Clinic! As a de
     Provide your answer in Vietnamese, following these guidelines for a helpful and professional customer service experience.
 """
 
-CUSTOM_QUESTION_PROMPT = PromptTemplate(input_variables=["context", "question", "chat_history"], template = template)
+CUSTOM_QUESTION_PROMPT = PromptTemplate(input_variables=["context", "question", "chat_history"], template=template)
 
 API_O = st.secrets["OPENAI_API_KEY"]
 # Session state storage would be ideal
@@ -91,14 +100,15 @@ else:
     st.sidebar.warning('API key required to try this app.The API key is not stored in any form.')
 
 # Get the user input
-user_input = get_text()
-
+user_input = st.session_state.input_text
 
 # Generate the output using the ConversationChain object and the user input, and add the input/output to the session
 if user_input:
-    output = qa({"question": user_input, "chat_history": st.session_state.chat_history})
-    st.session_state.chat_history.append(user_input)
+    output = qa({"question": user_input, "chat_history": st.session_state.history})
+    st.session_state.past.append(user_input)
     st.session_state.generated.append(output['answer'])
+    st.session_state.history.append({"message": user_input, "is_user": True})
+    st.session_state.history.append({"message": output['answer'], "is_user": False})
 
 
 # Display stored conversation sessions in the sidebar
@@ -112,4 +122,5 @@ if st.session_state.stored_session:
     if st.sidebar.checkbox("Clear-all"):
         del st.session_state.stored_session
 
-
+for i, chat in enumerate(st.session_state.history):
+    st_message(**chat, key=str(i)) #unpacking
