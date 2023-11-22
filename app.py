@@ -19,6 +19,8 @@ if "temp" not in st.session_state:
     st.session_state["temp"] = ""
 if "history" not in st.session_state:
     st.session_state.history = []
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 # Set up the Streamlit app layout
 st.title("Dental Care AI Chatbot")
@@ -56,11 +58,12 @@ def new_chat():
     st.session_state["stored_session"].append(save)
     st.session_state["generated"] = []
     st.session_state["past"] = []
-    st.session_state["input"] = ""
+    st.session_state["history"] = []
+    st.session_state["chat_history"] = []
 
 
-template = """Welcome to the virtual assistance of DR DEE Dental Clinic! As a dental assistant chatbot, your primary role is to provide customers with accurate information about dental care. Follow these guidelines to ensure effective and professional customer service:
-    Initial Response: Always start your reply with a friendly greeting using 'Dạ' to acknowledge the customer and express your readiness to assist.
+template = """As a dental assistant chatbot, your primary role is to provide customers with accurate information about dental care. Follow these guidelines to ensure effective and professional customer service:
+    Initial Response: Always start your reply with a friendly greeting using 'Dạ' to acknowledge the customer and express your readiness to assist. Use "Bên em" when addressing customers, don't use "Chúng tôi".
     Clarity and Brevity: Keep your answers clear and concise. Aim to provide precise information in response to customer inquiries.
     Context-Driven Responses: Utilize the provided context to inform your responses. The context should guide you in giving accurate and relevant information.
     {context}
@@ -85,7 +88,7 @@ if API_O:
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
     # Create an OpenAI instance
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.0)
+    llm = ChatOpenAI(model_name="gpt-4", temperature=0.0)
 
     # Create the ConversationChain object with the specified configuration
     qa = ConversationalRetrievalChain.from_llm(
@@ -104,11 +107,12 @@ user_input = get_text()
 
 # Generate the output using the ConversationChain object and the user input, and add the input/output to the session
 if user_input:
-    output = qa({"question": user_input, "chat_history": st.session_state.history})
+    output = qa({"question": user_input, "chat_history": st.session_state.chat_history})
     st.session_state.past.append(user_input)
     st.session_state.generated.append(output['answer'])
-    st.session_state.history.append({"message": user_input, "is_user": True})
-    st.session_state.history.append({"message": output['answer'], "is_user": False})
+    st.session_state.history.append({"message": user_input, "is_user": True, "avatar_style":"adventurer", "seed":'Aneka'})
+    st.session_state.history.append({"message": output['answer'].replace('Assistant:', ""), "is_user": False, "avatar_style":"bottts", "seed":'Cookie'})
+    st.session_state.chat_history.extend([(user_input, output['answer'])])
 
 
 # Display stored conversation sessions in the sidebar
