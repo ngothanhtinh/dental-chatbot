@@ -100,7 +100,7 @@ else:
     st.sidebar.warning('API key required to try this app.The API key is not stored in any form.')
 
 # Get the user input
-user_input = st.session_state.input_text
+user_input = get_text()
 
 # Generate the output using the ConversationChain object and the user input, and add the input/output to the session
 if user_input:
