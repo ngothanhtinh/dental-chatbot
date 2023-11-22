@@ -1,8 +1,6 @@
 import streamlit as st
-<<<<<<< HEAD
 from streamlit_chat import message as st_message
 from langchain.prompts import PromptTemplate
->>>>>>> 96a62537fbd2ccb4e28fb723fcb7a45b98754b7c
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
