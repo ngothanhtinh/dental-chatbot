@@ -63,7 +63,7 @@ def new_chat():
 
 
 template = """As a dental assistant chatbot, your primary role is to provide customers with accurate information about dental care. Follow these guidelines to ensure effective and professional customer service:
-    Initial Response: Always start your reply with a friendly greeting using 'Dạ' to acknowledge the customer and express your readiness to assist. Use "Bên em" when addressing customers, don't use "Chúng tôi".
+    Initial Response: Always start your reply with a friendly greeting using 'Dạ' to acknowledge the customer and express your readiness to assist. Use "Bên em" when addressing customers, don't use "Chúng tôi". 
     Clarity and Brevity: Keep your answers clear and concise. Aim to provide precise information in response to customer inquiries.
     Context-Driven Responses: Utilize the provided context to inform your responses. The context should guide you in giving accurate and relevant information.
     {context}
@@ -126,5 +126,5 @@ if st.session_state.stored_session:
     if st.sidebar.checkbox("Clear-all"):
         del st.session_state.stored_session
 
-for i, chat in enumerate(st.session_state.history):
-    st_message(**chat, key=str(i)) #unpacking
+# for i, chat in enumerate(st.session_state.history):
+#     st_message(**chat, key=str(i)) #unpacking

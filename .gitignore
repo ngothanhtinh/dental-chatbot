@@ -1,3 +1,4 @@
    db/index.faiss
    db/index.pkl
+   .streamlit/
    .streamlit/secrets.toml
