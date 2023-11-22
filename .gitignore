@@ -2,3 +2,4 @@
    db/index.pkl
    .streamlit/
    .streamlit/secrets.toml
+   *.toml
