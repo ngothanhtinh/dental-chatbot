@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_chat import message as st_message
+from streamlit_chat import message as message
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
@@ -7,14 +7,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
 # Initialize session states
-if "generated" not in st.session_state:
-    st.session_state["generated"] = []
-if "past" not in st.session_state:
-    st.session_state["past"] = []
 if "input" not in st.session_state:
     st.session_state["input"] = ""
-if "stored_session" not in st.session_state:
-    st.session_state["stored_session"] = []
 if "temp" not in st.session_state:
     st.session_state["temp"] = ""
 if "history" not in st.session_state:
@@ -23,15 +17,7 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # Set up the Streamlit app layout
-st.title("Dental Care AI Chatbot")
-
-hide_default_format = """
-       <style>
-       #MainMenu {visibility: hidden; }
-       footer {visibility: hidden;}
-       </style>
-       """
-st.markdown(hide_default_format, unsafe_allow_html=True)
+st.title("Dental Chatbot Demo")
 
 
 def clear_text():
@@ -49,21 +35,8 @@ def get_text():
     return input_text
 
 
-# Define function to start a new chat
-def new_chat():
-    save = []
-    for i in range(len(st.session_state['generated'])-1, -1, -1):
-        save.append("User:" + st.session_state["past"][i])
-        save.append("Bot:" + st.session_state["generated"][i])
-    st.session_state["stored_session"].append(save)
-    st.session_state["generated"] = []
-    st.session_state["past"] = []
-    st.session_state["history"] = []
-    st.session_state["chat_history"] = []
-
-
-template = """As a dental assistant chatbot, your primary role is to provide customers with accurate information about dental care. Follow these guidelines to ensure effective and professional customer service:
-    Initial Response: Always start your reply with a friendly greeting using 'Dạ' to acknowledge the customer and express your readiness to assist. Use "Bên em" when addressing customers, don't use "Chúng tôi". 
+template = """Welcome to the virtual assistance of DR DEE Dental Clinic! As a dental assistant chatbot, your primary role is to provide customers with accurate information about dental care. Follow these guidelines to ensure effective and professional customer service:
+    Initial Response: Always start your reply with a friendly greeting using 'Dạ' to acknowledge the customer and express your readiness to assist. 
     Clarity and Brevity: Keep your answers clear and concise. Aim to provide precise information in response to customer inquiries.
     Context-Driven Responses: Utilize the provided context to inform your responses. The context should guide you in giving accurate and relevant information.
     {context}
@@ -88,7 +61,7 @@ if API_O:
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
     # Create an OpenAI instance
-    llm = ChatOpenAI(model_name="gpt-4", temperature=0.0)
+    llm = ChatOpenAI(model_name="gpt-4-1106-preview", temperature=0.0)
 
     # Create the ConversationChain object with the specified configuration
     qa = ConversationalRetrievalChain.from_llm(
@@ -99,32 +72,16 @@ if API_O:
         return_source_documents=True,
         return_generated_question=True,
     )
-else:
-    st.sidebar.warning('API key required to try this app.The API key is not stored in any form.')
 
 # Get the user input
 user_input = get_text()
 
-# Generate the output using the ConversationChain object and the user input, and add the input/output to the session
+# Generate the output
 if user_input:
     output = qa({"question": user_input, "chat_history": st.session_state.chat_history})
-    st.session_state.past.append(user_input)
-    st.session_state.generated.append(output['answer'])
     st.session_state.history.append({"message": user_input, "is_user": True, "avatar_style":"adventurer", "seed":'Aneka'})
     st.session_state.history.append({"message": output['answer'].replace('Assistant:', ""), "is_user": False, "avatar_style":"bottts", "seed":'Cookie'})
     st.session_state.chat_history.extend([(user_input, output['answer'])])
 
-
-# Display stored conversation sessions in the sidebar
-for i, sublist in enumerate(st.session_state.stored_session):
-    with st.sidebar.expander(label=f"Conversation-Session:{i}"):
-        st.write(sublist)
-
-
-# Allow the user to clear all stored conversation sessions
-if st.session_state.stored_session:
-    if st.sidebar.checkbox("Clear-all"):
-        del st.session_state.stored_session
-
 for i, chat in enumerate(st.session_state.history):
-    st_message(**chat, key=str(i)) #unpacking
+    message(**chat, key=str(i)) #unpacking
